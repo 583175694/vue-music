@@ -1,46 +1,45 @@
 <template>
   <div class="music-list">
-  	<div class="back">
-  	  <i class="icon-back"></i>
-  	</div>
-  	<h1 class="title" v-html="title"></h1>
-  	<div class="bg-image" :style="bgStyle" ref="bgImage">
-  	  <div class="play-wrapper">
-        <div ref="playBtn" v-show="songs.length>0" class="play">
+    <div class="back" @click="back">
+      <i class="icon-back"></i>
+    </div>
+    <h1 class="title" v-html="title"></h1>
+    <div class="bg-image" :style="bgStyle" ref="bgImage">
+      <div class="play-wrapper">
+        <div ref="playBtn" v-show="songs.length>0" class="play" @click="random">
           <i class="icon-play"></i>
           <span class="text">随机播放全部</span>
         </div>
       </div>
-  	  <div class="filter" ref="filter"></div>
-  	</div>
-  	<div class="bg-layer" ref="layer"></div>
-  	<scroll :data="songs" @scroll="scroll" :listen-scroll="listenScroll" :probe-type="probeType" class="list" ref="list">
+      <div class="filter" ref="filter"></div>
+    </div>
+    <div class="bg-layer" ref="layer"></div>
+    <scroll :data="songs" @scroll="scroll"
+            :listen-scroll="listenScroll" :probe-type="probeType" class="list" ref="list">
       <div class="song-list-wrapper">
-  	    <song-list :songs="songs"></song-list>
-  	  </div>
-  	  <div class="loading-container" v-show="!songs.length">
-  	  	<loading></loading>
-  	  </div>
-  	</scroll>
+        <song-list :songs="songs" @select="selectItem"></song-list>
+      </div>
+      <div v-show="!songs.length" class="loading-container">
+        <loading></loading>
+      </div>
+    </scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import SongList from 'base/song-list/song-list'
   import {prefixStyle} from 'common/js/dom'
-  import Loading from 'base/loading/loading'
+  import {playlistMixin} from 'common/js/mixin'
+  import {mapActions} from 'vuex'
 
   const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
   const backdrop = prefixStyle('backdrop-filter')
 
   export default {
-    components: {
-      Scroll,
-      SongList,
-      Loading
-    },
+    mixins: [playlistMixin],
     props: {
       bgImage: {
         type: String,
@@ -65,14 +64,6 @@
         return `background-image:url(${this.bgImage})`
       }
     },
-    methods: {
-      scroll(pos) {
-        this.scrollY = pos.y
-      },
-      back() {
-        this.$router.back()
-      }
-    },
     created() {
       this.probeType = 3
       this.listenScroll = true
@@ -81,6 +72,34 @@
       this.imageHeight = this.$refs.bgImage.clientHeight
       this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
+    },
+    methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
+      scroll(pos) {
+        this.scrollY = pos.y
+      },
+      back() {
+        this.$router.back()
+      },
+      selectItem(item, index) {
+        this.selectPlay({
+          list: this.songs,
+          index
+        })
+      },
+      random() {
+        this.randomPlay({
+          list: this.songs
+        })
+      },
+      ...mapActions([
+        'selectPlay',
+        'randomPlay'
+      ])
     },
     watch: {
       scrollY(newY) {
@@ -110,6 +129,11 @@
         this.$refs.bgImage.style[transform] = `scale(${scale})`
         this.$refs.filter.style[backdrop] = `blur(${blur}px)`
       }
+    },
+    components: {
+      Scroll,
+      Loading,
+      SongList
     }
   }
 </script>
