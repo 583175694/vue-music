@@ -26,6 +26,16 @@
         default: 0
       }
     },
+    watch: {
+      percent(newPercent) {
+        if (newPercent >= 0 && !this.touch.initiated) {
+          const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
+          const offsetWidth = newPercent * barWidth
+          this.$refs.progress.style.width = `${offsetWidth}px`
+          this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
+        }
+      }
+    },
     created() {
       this.touch = {}
     },
@@ -43,35 +53,22 @@
         const offsetWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth, Math.max(0, this.touch.left + deltaX))
         this._offset(offsetWidth)
       },
-      progressTouchEnd() {
+      progressTouchEnd(e) {
         this.touch.initiated = false
-        this._triggerPercent()
-      },
-      progressClick(e) {
-        const rect = this.$refs.progressBar.getBoundingClientRect()
-        const offsetWidth = e.pageX - rect.left
-        this._offset(offsetWidth)
-        // 这里当我们点击 progressBtn 的时候，e.offsetX 获取不对
-        // this._offset(e.offsetX)
         this._triggerPercent()
       },
       _triggerPercent() {
         const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
         const percent = this.$refs.progress.clientWidth / barWidth
-        this.$emit('percentChange', percent)
+        this.$emit('progressChange', percent)
+      },
+      progressClick(e) {
+        this._offset(e.offsetX)
+        this._triggerPercent()
       },
       _offset(offsetWidth) {
         this.$refs.progress.style.width = `${offsetWidth}px`
-        this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px,0,0)`
-      }
-    },
-    watch: {
-      percent(newPercent) {
-        if (newPercent >= 0 && !this.touch.initiated) {
-          const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
-          const offsetWidth = newPercent * barWidth
-          this._offset(offsetWidth)
-        }
+        this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px, 0, 0)`
       }
     }
   }
