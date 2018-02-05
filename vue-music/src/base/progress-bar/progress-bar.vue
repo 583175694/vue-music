@@ -63,7 +63,7 @@
         this.$emit('progressChange', percent)
       },
       progressClick(e) {
-        this._offset(e.offsetX)
+        this._offset(e.offsetX - 8)
         this._triggerPercent()
       },
       _offset(offsetWidth) {
