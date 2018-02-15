@@ -20,7 +20,7 @@
         <div class="middle"
             @touchstart.prevent="middleTouchStart"
             @touchmove.prevent="middleTouchMove"
-            @touchend="middleTouchEnd"
+            @touchend.prevent="middleTouchEnd"
         >
           <div class="middle-l" ref="middleL">
             <div class="cd-wrapper" ref="cdWrapper">
@@ -404,6 +404,7 @@ export default {
           offsetWidth = -window.innerWidth
           opacity = 0
           this.currentShow = 'lyric'
+          this.touch.percent = 1
         } else {
           offsetWidth = 0
           opacity = 1
@@ -413,6 +414,7 @@ export default {
           offsetWidth = 0
           opacity = 1
           this.currentShow = 'cd'
+          this.touch.percent = 0
         } else {
           offsetWidth = -window.innerWidth
           opacity = 0
