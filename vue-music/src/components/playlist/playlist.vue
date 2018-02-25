@@ -24,7 +24,7 @@
           </ul>
         </Scroll>
         <div class="list-operate">
-          <div class="add">
+          <div class="add" @click="addSong">
             <i class="icon-add"></i>
             <span class="text">添加歌曲到队列</span>
           </div>
@@ -33,6 +33,8 @@
           <span>关闭</span>
         </div>
       </div>
+      <confirm ref="confirm" @confirm="confirmClear" text="是否清空播放列表" confirmBtnText="清空"></confirm>
+      <add-song ref="addSong"></add-song>
     </div>
   </transition>
 </template>
@@ -42,6 +44,8 @@
   import {playMode} from 'common/js/config'
   import Scroll from 'base/scroll/scroll'
   import {playerMixin} from 'common/js/mixin'
+  import Confirm from 'base/confirm/confirm'
+  import AddSong from 'components/add-song/add-song'
 
   export default {
     mixins: [playerMixin],
@@ -90,13 +94,20 @@
         }
       },
       clearHistory() {
+        this.$refs.confirm.show()
+      },
+      confirmClear() {
         this.delectSongList()
+        this.setPlayingState(false)
       },
       scrollToCurrent(current) {
         const index = this.sequenceList.findIndex((song) => {
           return current.id === song.id
         })
         this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+      },
+      addSong() {
+        this.$refs.addSong.show()
       },
       ...mapMutations({
         setCurrentIndex: 'SET_CURRENT_INDEX',
@@ -119,7 +130,9 @@
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Confirm,
+      AddSong
     }
   }
 </script>
