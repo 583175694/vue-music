@@ -9,7 +9,7 @@
             <span class="clear" @click.stop="clearHistory"><i class="icon-clear"></i></span>
           </h1>
         </div>
-        <Scroll ref="listContent" class="list-content" :data="sequenceList">
+        <Scroll :refreshDelay="refreshDelay" ref="listContent" class="list-content" :data="sequenceList">
           <ul>
             <li ref="listItem" class="item" v-for="(item, index) in sequenceList" @click="selectIcon(item, index)">
               <i class="current" :class="getCurrentIcon(item)"></i>
@@ -51,7 +51,8 @@
     mixins: [playerMixin],
     data() {
       return {
-        showFlag: false
+        showFlag: false,
+        refreshDelay: 100
       }
     },
     computed: {

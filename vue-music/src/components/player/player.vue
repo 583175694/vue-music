@@ -99,7 +99,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-import { mapMutations, mapGetters } from 'vuex'
+import { mapMutations, mapGetters, mapActions } from 'vuex'
 import animations from 'create-keyframe-animation'
 import { prefixStyle } from 'common/js/dom'
 import ProgressBar from 'base/progress-bar/progress-bar'
@@ -272,6 +272,7 @@ export default {
     // audio canplay属性的方法，canplay=true 时才可以进行播放歌曲
     ready() {
       this.songReady = true
+      this.savePlayHistory(this.currentSong)
     },
     // audio error属性的方法
     error() {
@@ -434,7 +435,10 @@ export default {
       setCurrentIndex: 'SET_CURRENT_INDEX',
       setPlayMode: 'SET_PLAY_MODE',
       setPlayList: 'SET_PLAYLIST'
-    })
+    }),
+    ...mapActions([
+      'savePlayHistory'
+    ])
   },
   watch: {
     currentSong(newSong, oldSong) {
