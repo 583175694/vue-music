@@ -94,7 +94,7 @@
       </div>
     </transition>
     <playlist ref="playlist"></playlist>
-    <audio ref="audio" :src="currentSong.url" @canplay="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+    <audio ref="audio" :src="currentSong.url" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
   </div>
 </template>
 
@@ -243,6 +243,7 @@ export default {
       }
       if (this.playing.length === 1) {
         this.loop()
+        return
       } else {
         let index = this.currentIndex + 1
         if (index === this.playlist.length) {
@@ -350,6 +351,9 @@ export default {
     // 获得歌词数据
     getLyric() {
       this.currentSong.getLyric().then((lyric) => {
+        if (this.currentSong.lyric !== lyric) {
+          return
+        }
         this.currentLyric = new Lyric(lyric, this.handleLyric)
         if (this.playing) {
           this.currentLyric.play()
@@ -453,7 +457,8 @@ export default {
       if (this.currentLyric) {
         this.currentLyric.stop()
       }
-      setTimeout(() => {
+      clearTimeout(this.timer)
+      this.timer = setTimeout(() => {
         this.$refs.audio.play()
         this.getLyric()
       }, 1000)
